@@ -1,14 +1,21 @@
 name: Per-module coverage
 
-# This workflow only tests and generates coverage for the game module(s)
-# that actually changed. Each module's coverage is uploaded as its own
-# artifact (coverage-<module>) so that a later workflow can assemble a
-# full-repo coverage picture by combining this run's artifacts with the
-# most recent artifact for every module that *wasn't* touched.
+# On a normal push/PR, this workflow only tests and generates coverage
+# for the game module(s) that actually changed. Each module's coverage is
+# uploaded as its own artifact (coverage-<module>) so that a later job
+# can assemble a full-repo coverage picture by combining this run's
+# artifacts with the most recent artifact for every module that *wasn't*
+# touched. A manual workflow_dispatch run bypasses the filter and tests
+# every module, to seed or refresh a full baseline.
 on:
   push:
     branches: [main]
   pull_request:
+  # Lets anyone force a full baseline run — every module tested and
+  # uploaded in one go, bypassing the changed-files filter below. Useful
+  # for seeding/refreshing Codacy's coverage picture for all 5 modules at
+  # once, rather than waiting for each one to be touched naturally.
+  workflow_dispatch:
 
 jobs:
   detect-changes:
@@ -38,7 +45,7 @@ jobs:
 
   test-tic-tac-toe:
     needs: detect-changes
-    if: needs.detect-changes.outputs.tic-tac-toe == 'true'
+    if: github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.tic-tac-toe == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +64,7 @@ jobs:
 
   test-hangman:
     needs: detect-changes
-    if: needs.detect-changes.outputs.hangman == 'true'
+    if: github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.hangman == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +83,7 @@ jobs:
 
   test-rock-paper-scissors:
     needs: detect-changes
-    if: needs.detect-changes.outputs.rock-paper-scissors == 'true'
+    if: github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.rock-paper-scissors == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -96,7 +103,7 @@ jobs:
 
   test-guess-the-number:
     needs: detect-changes
-    if: needs.detect-changes.outputs.guess-the-number == 'true'
+    if: github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.guess-the-number == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -116,7 +123,7 @@ jobs:
 
   test-blackjack:
     needs: detect-changes
-    if: needs.detect-changes.outputs.blackjack == 'true'
+    if: github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.blackjack == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
