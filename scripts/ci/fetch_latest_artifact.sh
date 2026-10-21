@@ -20,20 +20,27 @@ fi
 
 response=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100")
 
-artifact_id=$(echo "$response" | jq -r --arg name "$artifact_name" '
+candidates=$(echo "$response" | jq -r --arg name "$artifact_name" '
+  [.artifacts[] | select(.name == $name and .expired == false)] | length
+')
+
+selected=$(echo "$response" | jq -r --arg name "$artifact_name" '
   .artifacts
   | map(select(.name == $name and .expired == false))
   | sort_by(.created_at)
   | reverse
-  | .[0].id // empty
+  | .[0]
+  | if . == null then "" else "\(.id)\t\(.created_at)" end
 ')
 
-if [ -z "$artifact_id" ]; then
+if [ -z "$selected" ]; then
   echo "No artifact named '$artifact_name' found yet (expected before that module's first CI run) — skipping." >&2
   exit 0
 fi
 
-echo "Fetching latest '$artifact_name' artifact (id $artifact_id)..."
+artifact_id=${selected%%$'\t'*}
+created_at=${selected#*$'\t'}
+echo "Found $candidates candidate(s) for '$artifact_name'; using the newest (id $artifact_id, created $created_at)."
 zip_path="$out_dir/$artifact_name.zip"
 gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > "$zip_path"
 unzip -o -q "$zip_path" -d "$out_dir"
