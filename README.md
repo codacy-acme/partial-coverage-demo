@@ -61,5 +61,21 @@ cd games/rock_paper_scissors
 go test ./... -coverprofile=coverage.out
 ```
 
-CI wiring to generate these per-module reports automatically, cache them
-as artifacts, and merge + upload them to Codacy lands in follow-up PRs.
+## CI
+
+`.github/workflows/coverage.yml` does this automatically on every push
+and PR:
+
+1. Detects which `games/<name>/` module(s) changed.
+2. Tests and uploads a `coverage-<module>` artifact only for those.
+3. Fetches the most recent `coverage-<module>` artifact for every
+   module (this run's, if it was just regenerated above; otherwise the
+   latest one on record) and uploads all of them to Codacy as partial
+   reports for the commit, then finalizes.
+
+To force a full run across all 5 modules (e.g. to seed or refresh the
+baseline), trigger it manually:
+
+```
+gh workflow run coverage.yml --ref main
+```
