@@ -47,3 +47,8 @@ func Play(player, opponent Move) Outcome {
 	}
 	return Lose
 }
+
+// Beats returns the move that the given move defeats, e.g. Rock -> Scissors.
+func Beats(move Move) Move {
+	return beats[move]
+}

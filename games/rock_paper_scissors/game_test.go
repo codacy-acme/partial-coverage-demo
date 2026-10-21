@@ -16,6 +16,15 @@ func TestParseMoveInvalid(t *testing.T) {
 	}
 }
 
+func TestBeats(t *testing.T) {
+	cases := map[Move]Move{Rock: Scissors, Scissors: Paper, Paper: Rock}
+	for move, want := range cases {
+		if got := Beats(move); got != want {
+			t.Errorf("Beats(%s) = %s, want %s", move, got, want)
+		}
+	}
+}
+
 func TestPlayOutcomes(t *testing.T) {
 	cases := []struct {
 		player, opponent Move

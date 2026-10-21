@@ -17,6 +17,7 @@ type Game struct {
 	Min, Max    int
 	Attempts    int
 	MaxAttempts int
+	History     []int
 }
 
 func NewGame(secret, min, max, maxAttempts int) (*Game, error) {
@@ -28,6 +29,7 @@ func NewGame(secret, min, max, maxAttempts int) (*Game, error) {
 
 func (g *Game) Guess(n int) Hint {
 	g.Attempts++
+	g.History = append(g.History, n)
 	switch {
 	case n == g.Secret:
 		return Correct
