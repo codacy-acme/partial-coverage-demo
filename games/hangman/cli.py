@@ -12,6 +12,8 @@ def main():
     while not game.is_over():
         print(f"\nWord: {game.masked_word}")
         print(f"Attempts left: {game.remaining_attempts()}")
+        if game.incorrect_guesses:
+            print(f"Incorrect guesses: {', '.join(game.incorrect_guesses)}")
         letter = input("Guess a letter: ").strip()
         if len(letter) != 1 or not letter.isalpha():
             print("Please enter a single letter.")

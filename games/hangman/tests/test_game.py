@@ -42,6 +42,14 @@ def test_win_condition():
     assert not game.is_lost()
 
 
+def test_incorrect_guesses_tracks_misses_only():
+    game = HangmanGame("cat")
+    game.guess("c")
+    game.guess("z")
+    game.guess("y")
+    assert game.incorrect_guesses == ["y", "z"]
+
+
 def test_lose_condition():
     game = HangmanGame("cat", max_misses=2)
     game.guess("x")
