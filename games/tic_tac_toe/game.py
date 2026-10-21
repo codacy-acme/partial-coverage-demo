@@ -40,6 +40,9 @@ class Board:
     def corners(self):
         return [self.cells[i] for i in (0, 2, 6, 8)]
 
+    def center(self):
+        return self.cells[4]
+
     def is_game_over(self):
         return self.winner() is not None or self.is_full()
 

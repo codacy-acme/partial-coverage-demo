@@ -74,3 +74,8 @@ func (g *Game) Reset(secret int) {
 	g.Attempts = 0
 	g.History = nil
 }
+
+// IsWithinRange reports whether n falls within the game's [Min, Max] bounds.
+func (g *Game) IsWithinRange(n int) bool {
+	return n >= g.Min && n <= g.Max
+}

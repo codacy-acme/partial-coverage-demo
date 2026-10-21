@@ -55,3 +55,6 @@ class HangmanGame:
 
     def give_up(self):
         self.misses = self.max_misses
+
+    def word_set(self):
+        return set(self.word)

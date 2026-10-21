@@ -75,3 +75,9 @@ func Beats(move Move) Move {
 func RandomMove() Move {
 	return AllMoves[rand.Intn(len(AllMoves))]
 }
+
+// IsValidMove reports whether s parses as one of rock, paper, or scissors.
+func IsValidMove(s string) bool {
+	_, err := ParseMove(s)
+	return err == nil
+}

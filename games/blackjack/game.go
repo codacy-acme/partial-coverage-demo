@@ -125,6 +125,11 @@ func IsSoft17(hand []Card) bool {
 	return hasAce && total+10 == 17
 }
 
+// CardCount returns how many cards are in a hand.
+func CardCount(hand []Card) int {
+	return len(hand)
+}
+
 // IsBlackjack reports whether a 2-card starting hand is a natural 21.
 func IsBlackjack(hand []Card) bool {
 	return len(hand) == 2 && HandValue(hand) == 21
