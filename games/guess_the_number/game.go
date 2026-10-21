@@ -66,3 +66,11 @@ func (g *Game) GuessesSoFar() int {
 func (g *Game) Range() (min, max int) {
 	return g.Min, g.Max
 }
+
+// Reset starts a new round with a new secret, keeping the same bounds and
+// attempt limit.
+func (g *Game) Reset(secret int) {
+	g.Secret = secret
+	g.Attempts = 0
+	g.History = nil
+}
