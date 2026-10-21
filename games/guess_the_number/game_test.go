@@ -39,6 +39,32 @@ func TestLastGuess(t *testing.T) {
 	}
 }
 
+func TestReset(t *testing.T) {
+	g, _ := NewGame(50, 1, 100, 10)
+	g.Guess(10)
+	g.Guess(20)
+	g.Reset(75)
+	if g.Secret != 75 {
+		t.Errorf("expected secret 75 after reset, got %d", g.Secret)
+	}
+	if g.Attempts != 0 {
+		t.Errorf("expected 0 attempts after reset, got %d", g.Attempts)
+	}
+	if len(g.History) != 0 {
+		t.Errorf("expected empty history after reset, got %v", g.History)
+	}
+}
+
+func TestIsWithinRange(t *testing.T) {
+	g, _ := NewGame(50, 1, 100, 10)
+	if !g.IsWithinRange(1) || !g.IsWithinRange(100) || !g.IsWithinRange(50) {
+		t.Error("expected bounds and midpoint to be within range")
+	}
+	if g.IsWithinRange(0) || g.IsWithinRange(101) {
+		t.Error("expected values outside [1, 100] to not be within range")
+	}
+}
+
 func TestRange(t *testing.T) {
 	g, _ := NewGame(50, 1, 100, 10)
 	if min, max := g.Range(); min != 1 || max != 100 {
