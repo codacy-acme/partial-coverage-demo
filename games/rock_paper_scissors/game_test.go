@@ -16,6 +16,15 @@ func TestParseMoveInvalid(t *testing.T) {
 	}
 }
 
+func TestOpposite(t *testing.T) {
+	cases := map[Outcome]Outcome{Win: Lose, Lose: Win, Draw: Draw}
+	for in, want := range cases {
+		if got := Opposite(in); got != want {
+			t.Errorf("Opposite(%s) = %s, want %s", in, got, want)
+		}
+	}
+}
+
 func TestAllMoves(t *testing.T) {
 	if len(AllMoves) != 3 {
 		t.Fatalf("expected 3 moves, got %d", len(AllMoves))

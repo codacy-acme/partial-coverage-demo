@@ -65,6 +65,19 @@ func TestDetermineWinner(t *testing.T) {
 	}
 }
 
+func TestCardValue(t *testing.T) {
+	cases := map[Card]int{
+		{Rank: "7", Suit: "♠"}: 7,
+		{Rank: "K", Suit: "♥"}: 10,
+		{Rank: "A", Suit: "♦"}: 1,
+	}
+	for card, want := range cases {
+		if got := card.Value(); got != want {
+			t.Errorf("%s.Value() = %d, want %d", card, got, want)
+		}
+	}
+}
+
 func TestIsBlackjack(t *testing.T) {
 	natural := []Card{{Rank: "A", Suit: "♠"}, {Rank: "K", Suit: "♥"}}
 	if !IsBlackjack(natural) {

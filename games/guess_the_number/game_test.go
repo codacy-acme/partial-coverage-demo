@@ -39,6 +39,13 @@ func TestLastGuess(t *testing.T) {
 	}
 }
 
+func TestRange(t *testing.T) {
+	g, _ := NewGame(50, 1, 100, 10)
+	if min, max := g.Range(); min != 1 || max != 100 {
+		t.Errorf("Range() = (%d, %d), want (1, 100)", min, max)
+	}
+}
+
 func TestGuessesSoFar(t *testing.T) {
 	g, _ := NewGame(50, 1, 100, 10)
 	if g.GuessesSoFar() != 0 {
