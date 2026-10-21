@@ -38,12 +38,14 @@ while (( attempt <= MAX_ATTEMPTS )); do
   http_code=$(tail -n1 <<< "$response")
   body=$(sed '$d' <<< "$response")
 
-  if [[ "$http_code" != "200" ]]; then
+  if [[ "$http_code" == "404" ]]; then
+    coverage=""
+  elif [[ "$http_code" != "200" ]]; then
     echo "::error::Codacy API returned HTTP ${http_code}: ${body}" >&2
     exit 1
+  else
+    coverage=$(echo "$body" | jq -r '.coverage.totalCoveragePercentage // empty')
   fi
-
-  coverage=$(echo "$body" | jq -r '.coverage.totalCoveragePercentage // empty')
 
   if [[ -n "$coverage" ]]; then
     break
