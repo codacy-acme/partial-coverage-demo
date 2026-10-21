@@ -171,21 +171,39 @@ jobs:
           ./scripts/ci/fetch_latest_artifact.sh coverage-guess-the-number coverage/guess-the-number
           ./scripts/ci/fetch_latest_artifact.sh coverage-blackjack coverage/blackjack
 
-      - name: Determine which modules have a coverage report so far
-        id: reports
+      # Python (cobertura xml) and Go (native go test profile) can't be
+      # merged into one upload call: the Go profile needs an explicit
+      # --force-coverage-parser go, which would wrongly apply to the
+      # Python reports too if they were all passed to a single call. So
+      # each report is sent as its own --partial upload with the right
+      # parser, then one `final` tells Codacy all partials for this
+      # commit are in. The reporter CLI resolves the commit itself from
+      # the GitHub Actions context (correctly using the PR's head commit
+      # on pull_request events, not the synthetic merge-ref GITHUB_SHA).
+      - name: Upload each module's coverage to Codacy
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: |
-          files=$(find coverage -type f \( -name '*.xml' -o -name '*.out' \) | paste -sd, -)
-          echo "Collected reports: $files"
-          echo "list=$files" >> "$GITHUB_OUTPUT"
+          set -e
+          reporter() { bash <(curl -Ls https://coverage.codacy.com/get.sh) "$@"; }
+          uploaded=0
 
-      # The reporter CLI resolves the commit UUID itself from the GitHub
-      # Actions context, and already does the right thing on pull_request
-      # events (the PR's head commit, not the synthetic merge-ref commit
-      # GITHUB_SHA points to) — no explicit commit input needed or
-      # supported.
-      - name: Upload merged coverage to Codacy
-        if: steps.reports.outputs.list != ''
-        uses: codacy/codacy-coverage-reporter-action@v1
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: ${{ steps.reports.outputs.list }}
+          upload() {
+            local file=$1; shift
+            if [ -f "$file" ]; then
+              reporter report --partial "$@" -r "$file"
+              uploaded=1
+            fi
+          }
+
+          upload coverage/tic-tac-toe/coverage-tic-tac-toe.xml
+          upload coverage/hangman/coverage-hangman.xml
+          upload coverage/rock-paper-scissors/coverage.out --force-coverage-parser go
+          upload coverage/guess-the-number/coverage.out --force-coverage-parser go
+          upload coverage/blackjack/coverage.out --force-coverage-parser go
+
+          if [ "$uploaded" = "1" ]; then
+            reporter final
+          else
+            echo "No coverage reports available yet for this commit; skipping Codacy upload."
+          fi
