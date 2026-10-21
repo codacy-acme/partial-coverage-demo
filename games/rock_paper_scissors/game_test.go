@@ -25,6 +25,26 @@ func TestOpposite(t *testing.T) {
 	}
 }
 
+func TestRandomMoveIsAlwaysValid(t *testing.T) {
+	for i := 0; i < 50; i++ {
+		m := RandomMove()
+		if !validMoves[m] {
+			t.Fatalf("RandomMove() returned invalid move %s", m)
+		}
+	}
+}
+
+func TestIsValidMove(t *testing.T) {
+	for _, m := range AllMoves {
+		if !IsValidMove(string(m)) {
+			t.Errorf("IsValidMove(%q) = false, want true", m)
+		}
+	}
+	if IsValidMove("lizard") {
+		t.Error("IsValidMove(\"lizard\") = true, want false")
+	}
+}
+
 func TestAllMoves(t *testing.T) {
 	if len(AllMoves) != 3 {
 		t.Fatalf("expected 3 moves, got %d", len(AllMoves))
