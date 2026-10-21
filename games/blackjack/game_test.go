@@ -65,6 +65,17 @@ func TestDetermineWinner(t *testing.T) {
 	}
 }
 
+func TestIsBlackjack(t *testing.T) {
+	natural := []Card{{Rank: "A", Suit: "♠"}, {Rank: "K", Suit: "♥"}}
+	if !IsBlackjack(natural) {
+		t.Error("expected ace + king to be a blackjack")
+	}
+	threeCards := []Card{{Rank: "7", Suit: "♠"}, {Rank: "7", Suit: "♥"}, {Rank: "7", Suit: "♦"}}
+	if IsBlackjack(threeCards) {
+		t.Error("a 3-card 21 is not a blackjack")
+	}
+}
+
 func TestRenderHand(t *testing.T) {
 	hand := []Card{{Rank: "10", Suit: "♠"}, {Rank: "K", Suit: "♥"}}
 	if got, want := RenderHand(hand), "10♠ K♥"; got != want {

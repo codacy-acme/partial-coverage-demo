@@ -58,6 +58,12 @@ def test_incorrect_guesses_tracks_misses_only():
     assert game.incorrect_guesses == ["y", "z"]
 
 
+def test_str_matches_masked_word():
+    game = HangmanGame("cat")
+    game.guess("c")
+    assert str(game) == game.masked_word
+
+
 def test_lose_condition():
     game = HangmanGame("cat", max_misses=2)
     game.guess("x")

@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-	moves := []Move{Rock, Paper, Scissors}
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println("Rock, Paper, Scissors! Type rock, paper, or scissors.")
@@ -27,7 +26,7 @@ func main() {
 		return
 	}
 
-	opponent := moves[rand.Intn(len(moves))]
+	opponent := AllMoves[rand.Intn(len(AllMoves))]
 	fmt.Printf("Opponent played %s.\n", opponent)
 
 	switch Play(player, opponent) {

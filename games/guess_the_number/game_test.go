@@ -27,6 +27,18 @@ func TestGuessHints(t *testing.T) {
 	}
 }
 
+func TestLastGuess(t *testing.T) {
+	g, _ := NewGame(50, 1, 100, 10)
+	if _, ok := g.LastGuess(); ok {
+		t.Fatal("expected no last guess before any guess made")
+	}
+	g.Guess(10)
+	g.Guess(30)
+	if last, ok := g.LastGuess(); !ok || last != 30 {
+		t.Errorf("LastGuess() = (%d, %v), want (30, true)", last, ok)
+	}
+}
+
 func TestHistoryTracksGuesses(t *testing.T) {
 	g, _ := NewGame(50, 1, 100, 10)
 	g.Guess(10)

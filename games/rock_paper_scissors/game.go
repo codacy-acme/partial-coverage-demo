@@ -12,6 +12,8 @@ const (
 	Scissors Move = "scissors"
 )
 
+var AllMoves = []Move{Rock, Paper, Scissors}
+
 var validMoves = map[Move]bool{Rock: true, Paper: true, Scissors: true}
 
 // beats reports whether move a defeats move b.
