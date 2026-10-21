@@ -63,6 +63,10 @@ func TestDetermineWinner(t *testing.T) {
 	if r := DetermineWinner(higher, playerOk); r != PlayerWins {
 		t.Errorf("expected PlayerWins on higher score, got %v", r)
 	}
+
+	if r := DetermineWinner(playerOk, higher); r != DealerWins {
+		t.Errorf("expected DealerWins when dealer's score is higher without busting, got %v", r)
+	}
 }
 
 func TestCardValue(t *testing.T) {
@@ -75,6 +79,28 @@ func TestCardValue(t *testing.T) {
 		if got := card.Value(); got != want {
 			t.Errorf("%s.Value() = %d, want %d", card, got, want)
 		}
+	}
+}
+
+func TestIsSoft17(t *testing.T) {
+	soft := []Card{{Rank: "A", Suit: "♠"}, {Rank: "6", Suit: "♥"}}
+	if !IsSoft17(soft) {
+		t.Error("expected ace + 6 to be a soft 17")
+	}
+	hard := []Card{{Rank: "10", Suit: "♠"}, {Rank: "7", Suit: "♥"}}
+	if IsSoft17(hard) {
+		t.Error("10 + 7 is a hard 17, not soft")
+	}
+	notSeventeen := []Card{{Rank: "10", Suit: "♠"}, {Rank: "5", Suit: "♥"}}
+	if IsSoft17(notSeventeen) {
+		t.Error("expected a non-17 hand to not be a soft 17")
+	}
+}
+
+func TestCardCount(t *testing.T) {
+	hand := []Card{{Rank: "10", Suit: "♠"}, {Rank: "5", Suit: "♥"}, {Rank: "2", Suit: "♦"}}
+	if got := CardCount(hand); got != 3 {
+		t.Errorf("CardCount() = %d, want 3", got)
 	}
 }
 
