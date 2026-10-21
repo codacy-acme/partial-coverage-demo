@@ -1,0 +1,97 @@
+name: Test overall coverage gate action
+
+# Temporary workflow to validate .github/actions/overall-coverage-gate
+# (a vendored copy of codacy-acme/coverage-gate-action, not yet pushed
+# upstream) before it's pushed and tagged as its own repo/action.
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Known-good commit on main that already has a processed Codacy report.
+  # min-coverage=1 guarantees a pass regardless of actual coverage; this
+  # just validates the happy-path plumbing (API call, parsing, output).
+  sanity-pass:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: gate
+        uses: ./.github/actions/overall-coverage-gate
+        with:
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
+          organization: codacy-acme
+          repository: partial-coverage-demo
+          commit-sha: 7d1804de85f8c6211050275ed88810341a74798d
+          min-coverage: '1'
+          max-attempts: '1'
+      - run: echo "reported coverage = ${{ steps.gate.outputs.coverage }}"
+
+  # Same known-good commit, min-coverage=101 guarantees a fail regardless
+  # of actual coverage; validates the failure path and error message.
+  sanity-fail:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/overall-coverage-gate
+        with:
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
+          organization: codacy-acme
+          repository: partial-coverage-demo
+          commit-sha: 7d1804de85f8c6211050275ed88810341a74798d
+          min-coverage: '101'
+          max-attempts: '1'
+
+  # Same commit, realistic threshold (80%) to see how it behaves against
+  # this repo's actual overall coverage.
+  realistic-threshold:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - id: gate
+        uses: ./.github/actions/overall-coverage-gate
+        with:
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
+          organization: codacy-acme
+          repository: partial-coverage-demo
+          commit-sha: 7d1804de85f8c6211050275ed88810341a74798d
+          min-coverage: '80'
+          max-attempts: '1'
+      - run: echo "reported coverage = ${{ steps.gate.outputs.coverage }}"
+
+  # No commit-sha given: resolves to this PR's head commit via
+  # GITHUB_EVENT_PATH. This commit is brand new, so Codacy likely has no
+  # report for it yet (the demo repo's own coverage upload workflow may
+  # or may not have finished by the time this runs) - exercises the
+  # polling + fail-if-no-report=true path.
+  no-report-should-fail:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/overall-coverage-gate
+        with:
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
+          organization: codacy-acme
+          repository: partial-coverage-demo
+          min-coverage: '1'
+          fail-if-no-report: 'true'
+          max-attempts: '1'
+          retry-delay-seconds: '1'
+
+  # Same auto-resolved PR head commit, fail-if-no-report=false - should
+  # pass (skip) if no report exists yet, or pass normally if one does.
+  no-report-should-skip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/overall-coverage-gate
+        with:
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
+          organization: codacy-acme
+          repository: partial-coverage-demo
+          min-coverage: '1'
+          fail-if-no-report: 'false'
+          max-attempts: '1'
+          retry-delay-seconds: '1'
