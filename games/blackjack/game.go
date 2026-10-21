@@ -3,7 +3,10 @@
 // unit tested independently of the terminal front-end in main.go.
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 var ranks = []string{"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"}
 var suits = []string{"♠", "♥", "♦", "♣"}
@@ -96,4 +99,13 @@ func DetermineWinner(playerHand, dealerHand []Card) Result {
 // or below, stand on 17+.
 func DealerShouldHit(dealerHand []Card) bool {
 	return HandValue(dealerHand) < 17
+}
+
+// RenderHand formats a hand as space-separated cards, e.g. "10♠ K♥".
+func RenderHand(hand []Card) string {
+	cards := make([]string, len(hand))
+	for i, c := range hand {
+		cards[i] = c.String()
+	}
+	return strings.Join(cards, " ")
 }

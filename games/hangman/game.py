@@ -41,3 +41,7 @@ class HangmanGame:
     @property
     def incorrect_guesses(self):
         return sorted(letter for letter in self.guessed if letter not in self.word)
+
+    @property
+    def guesses_made(self):
+        return len(self.guessed)

@@ -16,14 +16,6 @@ func shuffledDeck() []Card {
 	return deck
 }
 
-func renderHand(hand []Card) string {
-	cards := make([]string, len(hand))
-	for i, c := range hand {
-		cards[i] = c.String()
-	}
-	return strings.Join(cards, " ")
-}
-
 func main() {
 	deck := shuffledDeck()
 	draw := func() Card {
@@ -39,7 +31,7 @@ func main() {
 	fmt.Println("Blackjack! Dealer hits until 17.")
 
 	for !IsBust(player) {
-		fmt.Printf("Your hand: %s (%d)\n", renderHand(player), HandValue(player))
+		fmt.Printf("Your hand: %s (%d)\n", RenderHand(player), HandValue(player))
 		fmt.Printf("Dealer shows: %s\n", dealer[0])
 		fmt.Print("Hit or stand? ")
 
@@ -63,7 +55,7 @@ func main() {
 		dealer = append(dealer, draw())
 	}
 
-	fmt.Printf("Your hand: %s (%d)\n", renderHand(player), HandValue(player))
-	fmt.Printf("Dealer hand: %s (%d)\n", renderHand(dealer), HandValue(dealer))
+	fmt.Printf("Your hand: %s (%d)\n", RenderHand(player), HandValue(player))
+	fmt.Printf("Dealer hand: %s (%d)\n", RenderHand(dealer), HandValue(dealer))
 	fmt.Println(DetermineWinner(player, dealer))
 }
