@@ -133,3 +133,50 @@ jobs:
           path: games/blackjack/coverage.out
           retention-days: 90
           overwrite: true
+
+  # Runs on every push to main, regardless of which (if any) module jobs
+  # above actually ran. For each of the 5 modules it fetches the most
+  # recent coverage-<module> artifact (this run's, if that module was just
+  # tested above; otherwise the latest one on record) and uploads all 5 to
+  # Codacy as partial reports for this commit, then finalizes — so Codacy
+  # always sees a complete, up-to-date coverage picture even though only
+  # the touched module was actually re-tested.
+  merge-and-upload-coverage:
+    needs:
+      - test-tic-tac-toe
+      - test-hangman
+      - test-rock-paper-scissors
+      - test-guess-the-number
+      - test-blackjack
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch latest coverage artifact for every module
+        run: |
+          set -e
+          ./scripts/ci/fetch_latest_artifact.sh coverage-tic-tac-toe coverage/tic-tac-toe
+          ./scripts/ci/fetch_latest_artifact.sh coverage-hangman coverage/hangman
+          ./scripts/ci/fetch_latest_artifact.sh coverage-rock-paper-scissors coverage/rock-paper-scissors
+          ./scripts/ci/fetch_latest_artifact.sh coverage-guess-the-number coverage/guess-the-number
+          ./scripts/ci/fetch_latest_artifact.sh coverage-blackjack coverage/blackjack
+
+      - name: Determine which modules have a coverage report so far
+        id: reports
+        run: |
+          files=$(find coverage -type f \( -name '*.xml' -o -name '*.out' \) | paste -sd, -)
+          echo "Collected reports: $files"
+          echo "list=$files" >> "$GITHUB_OUTPUT"
+
+      - name: Upload merged coverage to Codacy
+        if: steps.reports.outputs.list != ''
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: ${{ steps.reports.outputs.list }}

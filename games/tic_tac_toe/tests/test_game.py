@@ -70,6 +70,12 @@ def test_play_after_game_over_raises():
         game.play(5)
 
 
+def test_result_is_none_mid_game():
+    game = TicTacToe()
+    game.play(0)
+    assert game.result() is None
+
+
 def test_draw_game_result():
     game = TicTacToe()
     for pos in (0, 1, 2, 5, 3, 4, 7, 6, 8):
