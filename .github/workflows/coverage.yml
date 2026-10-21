@@ -1,0 +1,135 @@
+name: Per-module coverage
+
+# This workflow only tests and generates coverage for the game module(s)
+# that actually changed. Each module's coverage is uploaded as its own
+# artifact (coverage-<module>) so that a later workflow can assemble a
+# full-repo coverage picture by combining this run's artifacts with the
+# most recent artifact for every module that *wasn't* touched.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      tic-tac-toe: ${{ steps.filter.outputs.tic-tac-toe }}
+      hangman: ${{ steps.filter.outputs.hangman }}
+      rock-paper-scissors: ${{ steps.filter.outputs.rock-paper-scissors }}
+      guess-the-number: ${{ steps.filter.outputs.guess-the-number }}
+      blackjack: ${{ steps.filter.outputs.blackjack }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            tic-tac-toe:
+              - 'games/tic_tac_toe/**'
+            hangman:
+              - 'games/hangman/**'
+            rock-paper-scissors:
+              - 'games/rock_paper_scissors/**'
+            guess-the-number:
+              - 'games/guess_the_number/**'
+            blackjack:
+              - 'games/blackjack/**'
+
+  test-tic-tac-toe:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.tic-tac-toe == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: coverage run --source=games/tic_tac_toe -m pytest games/tic_tac_toe
+      - run: coverage xml -o coverage-tic-tac-toe.xml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-tic-tac-toe
+          path: coverage-tic-tac-toe.xml
+          retention-days: 90
+          overwrite: true
+
+  test-hangman:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.hangman == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: coverage run --source=games/hangman -m pytest games/hangman
+      - run: coverage xml -o coverage-hangman.xml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-hangman
+          path: coverage-hangman.xml
+          retention-days: 90
+          overwrite: true
+
+  test-rock-paper-scissors:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.rock-paper-scissors == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: games/rock_paper_scissors
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - run: go test ./... -coverprofile=coverage.out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-rock-paper-scissors
+          path: games/rock_paper_scissors/coverage.out
+          retention-days: 90
+          overwrite: true
+
+  test-guess-the-number:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.guess-the-number == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: games/guess_the_number
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - run: go test ./... -coverprofile=coverage.out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-guess-the-number
+          path: games/guess_the_number/coverage.out
+          retention-days: 90
+          overwrite: true
+
+  test-blackjack:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.blackjack == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: games/blackjack
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - run: go test ./... -coverprofile=coverage.out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-blackjack
+          path: games/blackjack/coverage.out
+          retention-days: 90
+          overwrite: true
