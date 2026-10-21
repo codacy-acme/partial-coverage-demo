@@ -43,6 +43,31 @@ def test_available_moves():
     assert board.available_moves() == [1, 2, 3, 5, 6, 7, 8]
 
 
+def test_reset_clears_the_board():
+    board = Board()
+    board.place(0, "X")
+    board.place(4, "O")
+    board.reset()
+    assert board.cells == [" "] * 9
+    assert board.available_moves() == list(range(9))
+
+
+def test_corners_returns_the_four_corner_cells():
+    board = Board()
+    board.place(0, "X")
+    board.place(2, "O")
+    board.place(6, "X")
+    board.place(8, "O")
+    assert board.corners() == ["X", "O", "X", "O"]
+
+
+def test_center_returns_the_middle_cell():
+    board = Board()
+    assert board.center() == " "
+    board.place(4, "X")
+    assert board.center() == "X"
+
+
 def test_row_win():
     board = Board()
     for pos in (0, 1, 2):
