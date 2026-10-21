@@ -37,6 +37,9 @@ class Board:
     def available_moves(self):
         return [i for i, cell in enumerate(self.cells) if cell == " "]
 
+    def corners(self):
+        return [self.cells[i] for i in (0, 2, 6, 8)]
+
     def is_game_over(self):
         return self.winner() is not None or self.is_full()
 

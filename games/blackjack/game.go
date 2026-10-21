@@ -108,6 +108,23 @@ func DealerShouldHit(dealerHand []Card) bool {
 	return HandValue(dealerHand) < 17
 }
 
+// IsSoft17 reports whether a hand totals 17 by counting an ace as 11 (a
+// "soft" 17, where some house rules make the dealer hit instead of stand).
+func IsSoft17(hand []Card) bool {
+	if HandValue(hand) != 17 {
+		return false
+	}
+	hasAce := false
+	total := 0
+	for _, c := range hand {
+		total += c.Value()
+		if c.Rank == "A" {
+			hasAce = true
+		}
+	}
+	return hasAce && total+10 == 17
+}
+
 // IsBlackjack reports whether a 2-card starting hand is a natural 21.
 func IsBlackjack(hand []Card) bool {
 	return len(hand) == 2 && HandValue(hand) == 21
