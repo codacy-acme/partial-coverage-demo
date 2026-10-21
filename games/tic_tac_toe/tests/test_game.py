@@ -61,6 +61,14 @@ def test_draw():
     assert board.is_full()
 
 
+def test_moves_played():
+    game = TicTacToe()
+    assert game.moves_played == 0
+    game.play(0)
+    game.play(1)
+    assert game.moves_played == 2
+
+
 def test_full_game_win_flow():
     game = TicTacToe()
     assert game.current_player == "X"

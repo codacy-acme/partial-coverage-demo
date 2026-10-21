@@ -79,3 +79,22 @@ baseline), trigger it manually:
 ```
 gh workflow run coverage.yml --ref main
 ```
+
+### Verified permutations
+
+This was exercised across a run of PRs covering every combination of
+"how many/which modules changed":
+
+| Change | What ran |
+|---|---|
+| 1 module (Python) | that module only |
+| 1 module (Go) | that module only |
+| 2 modules | those two only |
+| 3 modules | those three only |
+| 4 modules | those four only |
+| all 5 modules | all five, in parallel |
+| non-game file (README, CI script) | nothing — every module's existing coverage carried forward unchanged |
+| manual `workflow_dispatch` | all five, regardless of what changed |
+
+In every case `merge-and-upload-coverage` ran and Codacy ended up with
+a complete, correctly-attributed coverage report for the commit.

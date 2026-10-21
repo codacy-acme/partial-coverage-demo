@@ -56,6 +56,10 @@ class TicTacToe:
     def current_player(self):
         return self.PLAYERS[self.turn_index]
 
+    @property
+    def moves_played(self):
+        return 9 - len(self.board.available_moves())
+
     def play(self, position):
         if self.board.is_game_over():
             raise InvalidMoveError("Game is already over")
