@@ -178,10 +178,14 @@ jobs:
           echo "Collected reports: $files"
           echo "list=$files" >> "$GITHUB_OUTPUT"
 
+      # The reporter CLI resolves the commit UUID itself from the GitHub
+      # Actions context, and already does the right thing on pull_request
+      # events (the PR's head commit, not the synthetic merge-ref commit
+      # GITHUB_SHA points to) — no explicit commit input needed or
+      # supported.
       - name: Upload merged coverage to Codacy
         if: steps.reports.outputs.list != ''
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: ${{ steps.reports.outputs.list }}
-          commit-uuid: ${{ github.event.pull_request.head.sha || github.sha }}
