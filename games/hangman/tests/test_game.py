@@ -69,6 +69,24 @@ def test_str_matches_masked_word():
     assert str(game) == game.masked_word
 
 
+def test_give_up_ends_the_game_as_a_loss():
+    game = HangmanGame("cat")
+    game.guess("c")
+    assert not game.is_over()
+    game.give_up()
+    assert game.is_lost()
+    assert game.is_over()
+    assert not game.is_won()
+
+
+def test_word_set_is_unique_letters():
+    game = HangmanGame("codacy")
+    assert game.word_set() == set("codacy")
+
+    game2 = HangmanGame("coo")
+    assert game2.word_set() == {"c", "o"}
+
+
 def test_lose_condition():
     game = HangmanGame("cat", max_misses=2)
     game.guess("x")
