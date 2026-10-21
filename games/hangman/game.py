@@ -45,3 +45,6 @@ class HangmanGame:
     @property
     def guesses_made(self):
         return len(self.guessed)
+
+    def __str__(self):
+        return self.masked_word

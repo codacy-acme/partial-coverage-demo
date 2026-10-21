@@ -41,6 +41,9 @@ class Board:
         rows = [self.cells[i:i + 3] for i in range(0, 9, 3)]
         return "\n------\n".join("|".join(row) for row in rows)
 
+    def __str__(self):
+        return self.render()
+
 
 class TicTacToe:
     PLAYERS = ("X", "O")

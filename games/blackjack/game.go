@@ -101,6 +101,11 @@ func DealerShouldHit(dealerHand []Card) bool {
 	return HandValue(dealerHand) < 17
 }
 
+// IsBlackjack reports whether a 2-card starting hand is a natural 21.
+func IsBlackjack(hand []Card) bool {
+	return len(hand) == 2 && HandValue(hand) == 21
+}
+
 // RenderHand formats a hand as space-separated cards, e.g. "10♠ K♥".
 func RenderHand(hand []Card) string {
 	cards := make([]string, len(hand))

@@ -16,6 +16,17 @@ func TestParseMoveInvalid(t *testing.T) {
 	}
 }
 
+func TestAllMoves(t *testing.T) {
+	if len(AllMoves) != 3 {
+		t.Fatalf("expected 3 moves, got %d", len(AllMoves))
+	}
+	for _, m := range AllMoves {
+		if !validMoves[m] {
+			t.Errorf("AllMoves contains invalid move %s", m)
+		}
+	}
+}
+
 func TestBeats(t *testing.T) {
 	cases := map[Move]Move{Rock: Scissors, Scissors: Paper, Paper: Rock}
 	for move, want := range cases {

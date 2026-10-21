@@ -47,3 +47,12 @@ func (g *Game) IsOver() bool {
 func (g *Game) AttemptsRemaining() int {
 	return g.MaxAttempts - g.Attempts
 }
+
+// LastGuess returns the most recent guess, or ok=false if no guess has
+// been made yet.
+func (g *Game) LastGuess() (guess int, ok bool) {
+	if len(g.History) == 0 {
+		return 0, false
+	}
+	return g.History[len(g.History)-1], true
+}

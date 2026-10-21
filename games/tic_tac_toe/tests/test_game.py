@@ -30,6 +30,12 @@ def test_place_on_taken_cell():
         board.place(0, "O")
 
 
+def test_str_matches_render():
+    board = Board()
+    board.place(0, "X")
+    assert str(board) == board.render()
+
+
 def test_available_moves():
     board = Board()
     board.place(0, "X")
