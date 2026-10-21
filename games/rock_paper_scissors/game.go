@@ -50,6 +50,19 @@ func Play(player, opponent Move) Outcome {
 	return Lose
 }
 
+// Opposite flips an outcome to the other player's perspective: a Win for
+// one side is a Lose for the other, and a Draw stays a Draw.
+func Opposite(outcome Outcome) Outcome {
+	switch outcome {
+	case Win:
+		return Lose
+	case Lose:
+		return Win
+	default:
+		return Draw
+	}
+}
+
 // Beats returns the move that the given move defeats, e.g. Rock -> Scissors.
 func Beats(move Move) Move {
 	return beats[move]

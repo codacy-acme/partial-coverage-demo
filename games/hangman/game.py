@@ -48,3 +48,7 @@ class HangmanGame:
 
     def __str__(self):
         return self.masked_word
+
+    @property
+    def word_length(self):
+        return len(self.word)

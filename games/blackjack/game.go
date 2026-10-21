@@ -20,6 +20,13 @@ func (c Card) String() string {
 	return fmt.Sprintf("%s%s", c.Rank, c.Suit)
 }
 
+// Value returns the card's blackjack value, treating Ace as 1. Use
+// HandValue for a full hand, which promotes a soft ace to 11 when it
+// doesn't bust.
+func (c Card) Value() int {
+	return c.baseValue()
+}
+
 // baseValue returns a card's blackjack value, treating Ace as 1 (soft aces
 // are promoted to 11 in HandValue when it doesn't bust the hand).
 func (c Card) baseValue() int {

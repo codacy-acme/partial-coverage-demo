@@ -61,3 +61,8 @@ func (g *Game) LastGuess() (guess int, ok bool) {
 func (g *Game) GuessesSoFar() int {
 	return len(g.History)
 }
+
+// Range returns the inclusive bounds the secret was chosen from.
+func (g *Game) Range() (min, max int) {
+	return g.Min, g.Max
+}
