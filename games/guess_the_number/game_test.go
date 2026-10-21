@@ -39,6 +39,18 @@ func TestLastGuess(t *testing.T) {
 	}
 }
 
+func TestGuessesSoFar(t *testing.T) {
+	g, _ := NewGame(50, 1, 100, 10)
+	if g.GuessesSoFar() != 0 {
+		t.Fatalf("expected 0 guesses before any guess made, got %d", g.GuessesSoFar())
+	}
+	g.Guess(10)
+	g.Guess(20)
+	if g.GuessesSoFar() != 2 {
+		t.Errorf("expected 2 guesses, got %d", g.GuessesSoFar())
+	}
+}
+
 func TestHistoryTracksGuesses(t *testing.T) {
 	g, _ := NewGame(50, 1, 100, 10)
 	g.Guess(10)
