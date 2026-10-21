@@ -37,3 +37,7 @@ class HangmanGame:
 
     def remaining_attempts(self):
         return self.max_misses - self.misses
+
+    @property
+    def incorrect_guesses(self):
+        return sorted(letter for letter in self.guessed if letter not in self.word)
