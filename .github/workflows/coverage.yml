@@ -133,3 +133,77 @@ jobs:
           path: games/blackjack/coverage.out
           retention-days: 90
           overwrite: true
+
+  # Runs on every push to main, regardless of which (if any) module jobs
+  # above actually ran. For each of the 5 modules it fetches the most
+  # recent coverage-<module> artifact (this run's, if that module was just
+  # tested above; otherwise the latest one on record) and uploads all 5 to
+  # Codacy as partial reports for this commit, then finalizes — so Codacy
+  # always sees a complete, up-to-date coverage picture even though only
+  # the touched module was actually re-tested.
+  merge-and-upload-coverage:
+    needs:
+      - test-tic-tac-toe
+      - test-hangman
+      - test-rock-paper-scissors
+      - test-guess-the-number
+      - test-blackjack
+    # Codacy expects a coverage upload on every commit, not just on main,
+    # so this runs regardless of event type — the commit-uuid below makes
+    # sure a pull_request run reports against the PR's actual head commit
+    # rather than GitHub's synthetic merge-ref SHA.
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch latest coverage artifact for every module
+        run: |
+          set -e
+          ./scripts/ci/fetch_latest_artifact.sh coverage-tic-tac-toe coverage/tic-tac-toe
+          ./scripts/ci/fetch_latest_artifact.sh coverage-hangman coverage/hangman
+          ./scripts/ci/fetch_latest_artifact.sh coverage-rock-paper-scissors coverage/rock-paper-scissors
+          ./scripts/ci/fetch_latest_artifact.sh coverage-guess-the-number coverage/guess-the-number
+          ./scripts/ci/fetch_latest_artifact.sh coverage-blackjack coverage/blackjack
+
+      # Python (cobertura xml) and Go (native go test profile) can't be
+      # merged into one upload call: the Go profile needs an explicit
+      # --force-coverage-parser go, which would wrongly apply to the
+      # Python reports too if they were all passed to a single call. So
+      # each report is sent as its own --partial upload with the right
+      # parser, then one `final` tells Codacy all partials for this
+      # commit are in. The reporter CLI resolves the commit itself from
+      # the GitHub Actions context (correctly using the PR's head commit
+      # on pull_request events, not the synthetic merge-ref GITHUB_SHA).
+      - name: Upload each module's coverage to Codacy
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: |
+          set -e
+          reporter() { bash <(curl -Ls https://coverage.codacy.com/get.sh) "$@"; }
+          uploaded=0
+
+          upload() {
+            local file=$1; shift
+            if [ -f "$file" ]; then
+              reporter report --partial "$@" -r "$file"
+              uploaded=1
+            fi
+          }
+
+          upload coverage/tic-tac-toe/coverage-tic-tac-toe.xml
+          upload coverage/hangman/coverage-hangman.xml
+          upload coverage/rock-paper-scissors/coverage.out --force-coverage-parser go
+          upload coverage/guess-the-number/coverage.out --force-coverage-parser go
+          upload coverage/blackjack/coverage.out --force-coverage-parser go
+
+          if [ "$uploaded" = "1" ]; then
+            reporter final
+          else
+            echo "No coverage reports available yet for this commit; skipping Codacy upload."
+          fi
