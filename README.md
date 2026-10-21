@@ -21,14 +21,17 @@ modules. The problem it demonstrates:
 
 ```
 games/
-  tic_tac_toe/   (Python)
-  hangman/       (Python)
-  ...more games added in later PRs (Go)
+  tic_tac_toe/           (Python)
+  hangman/                (Python)
+  rock_paper_scissors/    (Go)
+  guess_the_number/       (Go)
+  blackjack/              (Go)
 ```
 
-Each game under `games/<name>/` is a self-contained module with its own
-game logic, a terminal front-end, and its own tests — so each module's
-coverage can be generated and uploaded independently.
+Each game under `games/<name>/` is a self-contained module (own game
+logic, terminal front-end, and tests) — so each module's coverage can be
+generated and uploaded independently. Go games are each their own Go
+module (`go.mod`) for the same reason.
 
 ## Playing the games
 
@@ -36,13 +39,26 @@ coverage can be generated and uploaded independently.
 pip install -r requirements-dev.txt
 python play.py tic-tac-toe
 python play.py hangman
+
+cd games/rock_paper_scissors && go run .
+cd games/guess_the_number && go run .
+cd games/blackjack && go run .
 ```
 
 ## Running tests / coverage for a single module
 
+Python:
+
 ```
 coverage run --source=games/tic_tac_toe -m pytest games/tic_tac_toe
 coverage xml -o coverage-tic-tac-toe.xml
+```
+
+Go:
+
+```
+cd games/rock_paper_scissors
+go test ./... -coverprofile=coverage.out
 ```
 
 CI wiring to generate these per-module reports automatically, cache them
