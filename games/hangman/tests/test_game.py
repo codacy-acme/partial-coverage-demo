@@ -42,6 +42,14 @@ def test_win_condition():
     assert not game.is_lost()
 
 
+def test_guesses_made_counts_all_unique_letters():
+    game = HangmanGame("cat")
+    game.guess("c")
+    game.guess("z")
+    game.guess("c")
+    assert game.guesses_made == 2
+
+
 def test_incorrect_guesses_tracks_misses_only():
     game = HangmanGame("cat")
     game.guess("c")

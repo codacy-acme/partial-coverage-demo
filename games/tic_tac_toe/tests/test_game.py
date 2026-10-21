@@ -30,6 +30,13 @@ def test_place_on_taken_cell():
         board.place(0, "O")
 
 
+def test_available_moves():
+    board = Board()
+    board.place(0, "X")
+    board.place(4, "O")
+    assert board.available_moves() == [1, 2, 3, 5, 6, 7, 8]
+
+
 def test_row_win():
     board = Board()
     for pos in (0, 1, 2):

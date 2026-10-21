@@ -65,6 +65,13 @@ func TestDetermineWinner(t *testing.T) {
 	}
 }
 
+func TestRenderHand(t *testing.T) {
+	hand := []Card{{Rank: "10", Suit: "♠"}, {Rank: "K", Suit: "♥"}}
+	if got, want := RenderHand(hand), "10♠ K♥"; got != want {
+		t.Errorf("RenderHand(%v) = %q, want %q", hand, got, want)
+	}
+}
+
 func TestDealerShouldHit(t *testing.T) {
 	low := []Card{{Rank: "10", Suit: "♠"}, {Rank: "5", Suit: "♥"}}
 	if !DealerShouldHit(low) {

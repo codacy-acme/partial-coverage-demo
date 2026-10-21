@@ -31,6 +31,9 @@ class Board:
     def is_full(self):
         return " " not in self.cells
 
+    def available_moves(self):
+        return [i for i, cell in enumerate(self.cells) if cell == " "]
+
     def is_game_over(self):
         return self.winner() is not None or self.is_full()
 
