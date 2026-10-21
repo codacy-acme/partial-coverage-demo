@@ -52,3 +52,6 @@ class HangmanGame:
     @property
     def word_length(self):
         return len(self.word)
+
+    def give_up(self):
+        self.misses = self.max_misses

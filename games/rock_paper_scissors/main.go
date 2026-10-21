@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math/rand"
 	"os"
 	"strings"
 )
@@ -26,7 +25,7 @@ func main() {
 		return
 	}
 
-	opponent := AllMoves[rand.Intn(len(AllMoves))]
+	opponent := RandomMove()
 	fmt.Printf("Opponent played %s.\n", opponent)
 
 	switch Play(player, opponent) {
