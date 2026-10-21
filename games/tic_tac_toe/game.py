@@ -15,6 +15,9 @@ class Board:
     def __init__(self):
         self.cells = [" "] * 9
 
+    def reset(self):
+        self.cells = [" "] * 9
+
     def place(self, position, mark):
         if not 0 <= position <= 8:
             raise InvalidMoveError(f"Position {position} is out of range (0-8)")
