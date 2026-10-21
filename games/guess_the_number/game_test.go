@@ -27,6 +27,22 @@ func TestGuessHints(t *testing.T) {
 	}
 }
 
+func TestHistoryTracksGuesses(t *testing.T) {
+	g, _ := NewGame(50, 1, 100, 10)
+	g.Guess(10)
+	g.Guess(90)
+	g.Guess(50)
+	want := []int{10, 90, 50}
+	if len(g.History) != len(want) {
+		t.Fatalf("expected history %v, got %v", want, g.History)
+	}
+	for i, v := range want {
+		if g.History[i] != v {
+			t.Errorf("history[%d] = %d, want %d", i, g.History[i], v)
+		}
+	}
+}
+
 func TestIsOverAndAttemptsRemaining(t *testing.T) {
 	g, _ := NewGame(50, 1, 100, 2)
 	if g.IsOver() {
