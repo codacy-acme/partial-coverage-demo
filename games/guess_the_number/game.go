@@ -56,3 +56,8 @@ func (g *Game) LastGuess() (guess int, ok bool) {
 	}
 	return g.History[len(g.History)-1], true
 }
+
+// GuessesSoFar is the number of guesses made in this round.
+func (g *Game) GuessesSoFar() int {
+	return len(g.History)
+}
